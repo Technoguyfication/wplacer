@@ -396,15 +396,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                                 const resolvePawtectChunkUrl = async () => {
                                     try {
                                         if (window.__wplacerPawtectChunk && typeof window.__wplacerPawtectChunk === 'string') return window.__wplacerPawtectChunk;
-                                        const cached = localStorage.getItem('wplacerPawtectChunk');
-                                        if (cached) { window.__wplacerPawtectChunk = cached; return cached; }
                                         const urls = new Set();
                                         Array.from(document.querySelectorAll('script[src]')).forEach(s => { try { urls.add(new URL(s.src, location.href).href); } catch {} });
                                         Array.from(document.querySelectorAll('link[rel="modulepreload"][href], link[as="script"][href]')).forEach(l => { try { urls.add(new URL(l.href, location.href).href); } catch {} });
                                         try { (performance.getEntriesByType('resource') || []).forEach(e => { if (e && typeof e.name === 'string') urls.add(e.name); }); } catch {}
                                         const scripts = Array.from(urls).filter(src => /\/_app\/immutable\/chunks\/.*\.js(\?.*)?$/i.test(src));
                                         for (const src of scripts) {
-                                            try { const text = await fetch(src, { credentials: 'omit' }).then(r => r.text()); if (/get_pawtected_endpoint_payload|pawtect/i.test(text)) { localStorage.setItem('wplacerPawtectChunk', src); window.__wplacerPawtectChunk = src; return src; } } catch {}
+                                            try { const text = await fetch(src, { credentials: 'omit' }).then(r => r.text()); if (/get_pawtected_endpoint_payload|pawtect/i.test(text)) { window.__wplacerPawtectChunk = src; return src; } } catch {}
                                         }
                                         return null;
                                     } catch { return null; }
